@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../images/logo.svg";
 import { NavLink } from "react-router-dom";
-import { AppBar, Box, IconButton, Typography, Menu, MenuItem, Button, Container, Toolbar } from '@mui/material';
+import { useSelector, useDispatch } from "react-redux";
+import { getReadingList } from "../redux/actions/bookActions";
+import { AppBar, Box, IconButton, Typography, Menu, MenuItem, Button, Container, Toolbar, Badge } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 
 
 const PublicNavbar = () => {
+  const dispatch = useDispatch();
+  const { readingList } = useSelector(state => state.book);
   const [anchorElNav, setAnchorElNav] = useState(null);
+  
+  useEffect(() => {
+    dispatch(getReadingList());
+  }, [dispatch]);
+  
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -62,7 +71,12 @@ const PublicNavbar = () => {
                 onClick={handleCloseNavMenu}
                 component={NavLink} to="/reading"
               >
-                <Typography textAlign="center">Reading List</Typography>
+                <Typography textAlign="center">
+                  Reading List
+                  {readingList.length > 0 && (
+                    <Badge badgeContent={readingList.length} color="primary" sx={{ ml: 1 }} />
+                  )}
+                </Typography>
               </MenuItem>
 
             </Menu>
@@ -89,6 +103,11 @@ const PublicNavbar = () => {
               component={NavLink} to="/reading"
               variant="main"
               sx={{ fontWeight: "600", marginTop: "auto", marginBottom: "auto", marginLeft: "1rem" }}
+              startIcon={
+                <Badge badgeContent={readingList.length} color="primary">
+                  <BookmarkIcon />
+                </Badge>
+              }
             >
               Reading List
             </Button>

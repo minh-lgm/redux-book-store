@@ -1,67 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { getBooks, setCurrentPage, setSearchQuery } from "../redux/actions/bookActions";
 import PaginationBar from "../components/PaginationBar";
 import SearchForm from "../components/SearchForm";
-import api from "../apiService";
 import { FormProvider } from "../form";
 import { useForm } from "react-hook-form";
 import { Container, Alert, Box, Card, Stack, CardMedia, CardActionArea, Typography, CardContent } from "@mui/material";
 
-
-
 const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
 const HomePage = () => {
-  const [books, setBooks] = useState([]);
-  const [pageNum, setPageNum] = useState(1);
-  const totalPage = 10;
-  const limit = 10;
-
-  const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
+  const { books, loading, error, currentPage, searchQuery, totalPages, limit } = useSelector(state => state.book);
 
   const navigate = useNavigate()
   const handleClickBook = (bookId) => {
     navigate(`/books/${bookId}`);
   };
 
-
-
-
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let url = `/books?_page=${pageNum}&_limit=${limit}`;
-        if (query) url += `&q=${query}`;
-        const res = await api.get(url);
-        setBooks(res.data);
-        setErrorMessage("");
-      } catch (error) {
-        setErrorMessage(error.message);
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, [pageNum, limit, query]);
+    dispatch(getBooks(currentPage, limit, searchQuery));
+  }, [dispatch, currentPage, limit, searchQuery]);
   //--------------form
   const defaultValues = {
-    searchQuery: ""
+    searchQuery: searchQuery || ""
   };
   const methods = useForm({
     defaultValues,
   });
   const { handleSubmit } = methods;
   const onSubmit = (data) => {
-    setQuery(data.searchQuery);
+    dispatch(setSearchQuery(data.searchQuery));
   };
   return (
     <Container>
       <Stack sx={{ display: "flex", alignItems: "center", m: "2rem" }}>
         <Typography variant="h3" sx={{ textAlign: "center" }}>Book Store</Typography>
-        {errorMessage && <Alert severity="danger">{errorMessage}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <Stack
             spacing={2}
@@ -74,9 +51,9 @@ const HomePage = () => {
           </Stack>
         </FormProvider>
         <PaginationBar
-          pageNum={pageNum}
-          setPageNum={setPageNum}
-          totalPageNum={totalPage}
+          pageNum={currentPage}
+          setPageNum={(page) => dispatch(setCurrentPage(page))}
+          totalPageNum={totalPages}
         />
       </Stack>
       <div>

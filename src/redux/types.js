@@ -1,0 +1,12 @@
+// Book types
+export const GET_BOOKS = 'GET_BOOKS';
+export const GET_BOOK_DETAIL = 'GET_BOOK_DETAIL';
+export const GET_READING_LIST = 'GET_READING_LIST';
+export const ADD_TO_READING_LIST = 'ADD_TO_READING_LIST';
+export const REMOVE_FROM_READING_LIST = 'REMOVE_FROM_READING_LIST';
+
+// UI types
+export const SET_LOADING = 'SET_LOADING';
+export const BOOKS_ERROR = 'BOOKS_ERROR';
+export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE';
+export const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
